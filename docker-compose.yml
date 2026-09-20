@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8107:8107"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-jiefangku-change-me}
+    volumes:
+      - jiefangku-data:/data
+    restart: unless-stopped
+
+volumes:
+  jiefangku-data:

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}工具档案 · 街坊库{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>🔧 工具档案</h1>
+    <p class="muted">共 {{ tools|length }} 件 · {{ DEPOSIT_RULE }}</p>
+  </div>
+  {% if user['role'] == 'admin' %}
+  <a class="btn btn-primary" href="{{ url_for('tool_new') }}">＋ 上架新工具</a>
+  {% endif %}
+</div>
+
+<form class="filters" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="搜索名称或描述…">
+  <select name="category">
+    <option value="">全部品类</option>
+    {% for c in categories %}
+    <option value="{{ c }}" {{ 'selected' if c == category }}>{{ c }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">全部状态</option>
+    {% for k, v in TOOL_STATUS.items() %}
+    <option value="{{ k }}" {{ 'selected' if k == status }}>{{ v }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn" type="submit">筛选</button>
+</form>
+
+{% if tools %}
+<div class="card-grid">
+  {% for t in tools %}
+  <a class="card tool-card" href="{{ url_for('tool_detail', tool_id=t['id']) }}">
+    <div class="card-top">
+      <span class="tag tag-cat">{{ t['category'] }}</span>
+      <span class="status status-{{ t['status'] }}">{{ TOOL_STATUS[t['status']] }}</span>
+    </div>
+    <h3>{{ t['name'] }}</h3>
+    <p class="muted small">🕐 {{ t['slots'] }}</p>
+    <div class="card-bottom">
+      <span class="deposit">押金 ¥{{ '%g' % t['deposit'] }}</span>
+      <span class="safety safety-{{ t['safety_level'] }}">{{ SAFETY_LEVELS[t['safety_level']] }}</span>
+    </div>
+    <p class="muted small">物主：{{ t['owner_name'] }} · {{ t['owner_building'] }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">没有符合条件的工具，换个筛选条件试试。</div>
+{% endif %}
+{% endblock %}

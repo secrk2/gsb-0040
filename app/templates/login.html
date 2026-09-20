@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}登录 · 街坊库{% endblock %}
+{% block content %}
+<div class="login-box">
+  <h1>🏘️ 街坊库</h1>
+  <p class="muted">邻里工具共享平台 · 请用内置账号登录（平台不开放注册）</p>
+  <form method="post" class="form">
+    <label>账号
+      <input type="text" name="username" required autofocus placeholder="如 admin">
+    </label>
+    <label>密码
+      <input type="password" name="password" required placeholder="••••••">
+    </label>
+    <button type="submit" class="btn btn-primary btn-block">登录</button>
+  </form>
+  <div class="demo-accounts">
+    <p><strong>演示账号</strong></p>
+    <p>楼长（管理员）：<code>admin</code> / <code>admin123</code> —— 可维护工具档案、查看完整联系方式、替邻居上架下架</p>
+    <p>普通邻居：<code>wangjianguo</code> / <code>123456</code>（其余邻居账号密码同为 123456）—— 仅可浏览，看到的是脱敏信息</p>
+  </div>
+</div>
+{% endblock %}

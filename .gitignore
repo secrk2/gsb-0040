@@ -12,3 +12,7 @@ coverage/
 *.log
 *.tsbuildinfo
 .DS_Store
+
+# 本地 SQLite 数据
+app/data/
+*.db

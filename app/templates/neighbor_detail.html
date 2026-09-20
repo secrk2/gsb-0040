@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ n['name'] }} · 街坊库{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ n['name'] }}
+    <span class="badge {{ 'badge-admin' if n['role']=='admin' else 'badge-neighbor' }}">
+      {{ '楼长' if n['role']=='admin' else '邻居' }}</span>
+  </h1>
+</div>
+
+<div class="detail-grid">
+  <section class="panel">
+    <h2>邻居卡片</h2>
+    {% if can_view_full %}
+    <dl class="kv">
+      <dt>楼栋</dt><dd>{{ n['building'] }}</dd>
+      <dt>门牌</dt><dd>{{ n['unit'] }}</dd>
+      <dt>手机号</dt><dd><code>{{ n['phone'] }}</code></dd>
+    </dl>
+    <p class="muted small">✅ 你{{ '是楼长，' if user['role']=='admin' and user['id'] != n['id'] }}有权查看完整联系方式。</p>
+    {% else %}
+    <dl class="kv">
+      <dt>楼栋</dt><dd>{{ masked['building'] }}</dd>
+      <dt>门牌</dt><dd class="muted">🔒 仅楼长可见</dd>
+      <dt>手机号</dt><dd><code>{{ masked['phone_tail'] }}</code> <span class="muted">（仅尾号）</span></dd>
+    </dl>
+    <p class="muted small">🔒 完整联系方式仅楼长（管理员）与本人可见。</p>
+    <a class="btn" href="{{ url_for('neighbor_contact', neighbor_id=n['id']) }}">🔑 查看完整联系方式</a>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>TA 家的工具（{{ tools|length }} 件）</h2>
+    {% if tools %}
+    <ul class="mini-list">
+      {% for t in tools %}
+      <li>
+        <a href="{{ url_for('tool_detail', tool_id=t['id']) }}">{{ t['name'] }}</a>
+        <span class="status status-{{ t['status'] }}">{{ TOOL_STATUS[t['status']] }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">还没有登记工具。</p>
+    {% endif %}
+  </section>
+</div>
+
+<p><a href="{{ url_for('neighbors') }}">← 返回邻居列表</a></p>
+{% endblock %}

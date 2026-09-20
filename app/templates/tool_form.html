@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ '上架新工具' if is_new else '编辑工具' }} · 街坊库{% endblock %}
+{% block content %}
+<h1>{{ '＋ 上架新工具' if is_new else '✏️ 编辑工具档案' }}</h1>
+<p class="muted">楼长可替邻居上架 / 下架工具；押金按件收取，归还退还。</p>
+
+<form method="post" class="form panel form-wide">
+  <label>工具名称 *
+    <input type="text" name="name" required value="{{ t['name'] if t else '' }}">
+  </label>
+  <div class="form-row">
+    <label>品类 *
+      <select name="category">
+        {% for c in categories %}
+        <option value="{{ c }}" {{ 'selected' if t and t['category'] == c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>押金（元/件）*
+      <input type="number" name="deposit" min="0" step="1" required value="{{ t['deposit'] if t else '' }}">
+    </label>
+  </div>
+  <label>可借时段 *
+    <input type="text" name="slots" required placeholder="如：工作日 18:00-21:00 / 周末 9:00-17:00"
+           value="{{ t['slots'] if t else '' }}">
+  </label>
+  <div class="form-row">
+    <label>安全等级 *
+      <select name="safety_level">
+        {% for k, v in SAFETY_LEVELS.items() %}
+        <option value="{{ k }}" {{ 'selected' if t and t['safety_level'] == k }}>{{ k }} 级 · {{ v }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>状态
+      <select name="status">
+        {% for k, v in TOOL_STATUS.items() %}
+        <option value="{{ k }}" {{ 'selected' if t and t['status'] == k }}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>安全说明（2 级及以上必填）
+    <textarea name="safety_note" rows="3">{{ t['safety_note'] if t else '' }}</textarea>
+  </label>
+  <label>所属邻居 *（楼长代登记）
+    <select name="owner_id">
+      {% for o in owners %}
+      <option value="{{ o['id'] }}" {{ 'selected' if t and t['owner_id'] == o['id'] }}>
+        {{ o['name'] }} · {{ o['building'] }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>补充说明
+    <textarea name="description" rows="3">{{ t['description'] if t else '' }}</textarea>
+  </label>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ '确认上架' if is_new else '保存修改' }}</button>
+    <a class="btn" href="{{ url_for('tools') }}">取消</a>
+  </div>
+</form>
+{% endblock %}

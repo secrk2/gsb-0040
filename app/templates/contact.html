@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}完整联系方式 · 街坊库{% endblock %}
+{% block content %}
+<section class="panel panel-narrow">
+  <h1>🔑 {{ n['name'] }} 的完整联系方式</h1>
+  <dl class="kv">
+    <dt>楼栋门牌</dt><dd>{{ n['building'] }} {{ n['unit'] }}</dd>
+    <dt>手机号</dt><dd><code>{{ n['phone'] }}</code></dd>
+  </dl>
+  <p class="muted small">此信息仅楼长（管理员）与本人可见，请勿外传。</p>
+  <p><a href="{{ url_for('neighbor_detail', neighbor_id=n['id']) }}">← 返回邻居卡片</a></p>
+</section>
+{% endblock %}
