@@ -1,0 +1,13 @@
+services:
+  jiefangku:
+    build: .
+    image: jiefangku:latest
+    container_name: jiefangku
+    ports:
+      - "8107:8107"
+    volumes:
+      - jiefangku-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  jiefangku-data:

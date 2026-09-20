@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>街坊库 · 邻里工具共享平台</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%B0%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- 登录页 -->
+  <div id="login-view" class="login-wrap" hidden>
+    <div class="login-card">
+      <div class="brand">
+        <span class="brand-logo">🧰</span>
+        <div>
+          <h1>街坊库</h1>
+          <p>电钻一年用两次，不如全楼共享一次</p>
+        </div>
+      </div>
+      <form id="login-form" class="login-form">
+        <label>账号
+          <input type="text" id="login-username" autocomplete="username" placeholder="如 louzhang" required />
+        </label>
+        <label>密码
+          <input type="password" id="login-password" autocomplete="current-password" placeholder="请输入密码" required />
+        </label>
+        <div id="login-error" class="form-error" hidden></div>
+        <button type="submit" class="btn btn-primary btn-block">登 录</button>
+      </form>
+      <div class="demo-accounts">
+        <p class="demo-title">演示账号（平台不开放注册，点击可自动填充）</p>
+        <div id="account-list" class="account-chips"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div id="app-view" hidden>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand brand-sm">
+          <span class="brand-logo">🧰</span>
+          <strong>街坊库</strong>
+          <span class="brand-sub">邻里工具共享平台</span>
+        </div>
+        <nav class="main-nav">
+          <button class="nav-btn" data-view="tools">工具档案</button>
+          <button class="nav-btn" data-view="neighbors">邻居管理</button>
+        </nav>
+        <div class="user-box">
+          <span id="user-name"></span>
+          <span id="user-role" class="role-badge"></span>
+          <button id="logout-btn" class="btn btn-ghost btn-sm">退出</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- 工具档案 -->
+      <section id="view-tools">
+        <div class="page-head">
+          <div>
+            <h2>工具档案</h2>
+            <p class="page-desc">每件共享工具的档案、押金与借用规则均在此公示。</p>
+          </div>
+          <button id="btn-new-tool" class="btn btn-primary" hidden>＋ 登记工具</button>
+        </div>
+
+        <div class="rule-banner">
+          <strong>📌 押金规则</strong>
+          <p>押金<strong>按件定额、按次收取</strong>：每件工具在档案中标注固定押金金额；<strong>每发起一次借用即冻结一次押金</strong>，归还并由物主/楼长验收无损坏后全额原路退还。若有人为损坏，按维修或折旧从押金中扣除。</p>
+        </div>
+
+        <div class="filter-bar">
+          <input type="search" id="filter-q" placeholder="搜索工具名称…" />
+          <select id="filter-category"><option value="">全部品类</option></select>
+          <select id="filter-status"><option value="">全部状态</option></select>
+          <span id="tool-count" class="count-hint"></span>
+        </div>
+
+        <div id="tool-grid" class="tool-grid"></div>
+      </section>
+
+      <!-- 邻居管理 -->
+      <section id="view-neighbors" hidden>
+        <div class="page-head">
+          <div>
+            <h2>邻居管理</h2>
+            <p class="page-desc">登记在册的共享住户，按楼栋门牌号排序。</p>
+          </div>
+        </div>
+
+        <div class="rule-banner rule-amber">
+          <strong>🔒 联系方式可见范围</strong>
+          <ul>
+            <li><strong>列表一律脱敏</strong>：所有账号（含楼长）在列表中只能看到「楼栋 + 手机号尾号」，看不到完整门牌与电话。</li>
+            <li><strong>完整联系方式</strong>（门牌号 + 完整手机号）：仅 <strong>楼长</strong> 可在住户详情页查看，用于借还联络与纠纷处理；住户本人可查看自己的完整档案。</li>
+            <li>普通邻居点击他人的「查看完整联系方式」将被拒绝，并看到明确的权限提示。</li>
+          </ul>
+        </div>
+
+        <div id="neighbor-list" class="neighbor-table"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 住户详情抽屉/弹层 -->
+  <div id="neighbor-modal" class="modal" hidden>
+    <div class="modal-mask" data-close></div>
+    <div class="modal-panel modal-narrow">
+      <button class="modal-close" data-close>×</button>
+      <div id="neighbor-detail"></div>
+    </div>
+  </div>
+
+  <!-- 工具表单弹层 -->
+  <div id="tool-modal" class="modal" hidden>
+    <div class="modal-mask" data-close></div>
+    <div class="modal-panel">
+      <button class="modal-close" data-close>×</button>
+      <h3 id="tool-form-title">登记工具</h3>
+      <form id="tool-form" class="tool-form">
+        <input type="hidden" id="f-id" />
+        <div class="form-row">
+          <label>工具名称 <span class="req">*</span>
+            <input type="text" id="f-name" maxlength="40" required placeholder="如 博世冲击钻" />
+          </label>
+          <label>品类 <span class="req">*</span>
+            <select id="f-category" required></select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>押金（元/件，每次借用冻结）<span class="req">*</span>
+            <input type="number" id="f-deposit" min="0" max="100000" step="1" required placeholder="如 200" />
+          </label>
+          <label>物主（楼长可代邻居登记）<span class="req">*</span>
+            <select id="f-owner" required></select>
+          </label>
+        </div>
+        <label>可借时段 <span class="req">*</span>
+          <input type="text" id="f-time" maxlength="100" required placeholder="如 工作日 19:00–21:30；周末全天" />
+        </label>
+        <div class="form-row">
+          <label>安全等级 <span class="req">*</span>
+            <select id="f-safety" required>
+              <option value="normal">普通工具 · 可直接借用</option>
+              <option value="instruction">需说明工具 · 借用前须阅读确认安全须知</option>
+            </select>
+          </label>
+          <label>状态 <span class="req">*</span>
+            <select id="f-status" required></select>
+          </label>
+        </div>
+        <label id="f-note-wrap" hidden>安全须知 <span class="req">*</span>
+          <textarea id="f-note" rows="4" maxlength="500" placeholder="「需说明」工具必须填写：使用前检查事项、防护装备要求、禁止行为等"></textarea>
+        </label>
+        <div id="tool-form-error" class="form-error" hidden></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-close>取消</button>
+          <button type="submit" class="btn btn-primary">保存档案</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
